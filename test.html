@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+  
+    <style type="text/css">
+    input[type='button']{
+    	width:100px;
+    }
+    </style>
+	
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.2.js"></script>
+	
+	
+</HEAD>
+
+<BODY>
+	<h1> Word game </h1>
+	<input id= "name" type="text"></input>
+	<input id= "score" type ="text"></input>
+	<input id= "SubmitScore" type ="button" value='Send Score'></input>
+	<input id= "Scorelist" type ="button" value='View Score List'></input>
+
+<script type ="text/javascript"> 
+			$.ajax({
+				url: 'https://brilliant-torch-9360.firebaseio.com/words.json',
+				type : 'GET',
+				dataType : 'json',
+                success : function(data){
+ 						console.log('data successfully retrieved ', data);
+                }
+			});
+
+			if (document.getElementById('SubmitScore')!== null) {
+				document.getElementById('SubmitScore').addEventListener('click', function(){
+				console.log('click submit score');
+				var Username = document.getElementById('name').value;
+				var score = document.getElementById('score').value;
+				var data= JSON.stringify({name:Username, score:score});
+				$.ajax({
+				url: 'https://brilliant-torch-9360.firebaseio.com/users.json',
+				type : 'POST',
+				data : data,
+				dataType : 'json',
+                success : function(data){
+ 						console.log('data successfully posted ', data);
+ 						//data.name = Username;
+                        console.log('retrieved data', data.name);
+                        var n=data.name;
+                        console.log('record url','https://brilliant-torch-9360.firebaseio.com/users'+ '/' +n+".json");
+
+                }
+			});             
+			});
+			}
+
+
+			if (document.getElementById('Scorelist') !== null) {
+				document.getElementById('Scorelist').addEventListener('click', function(){
+					$.ajax({
+						url: 'https://brilliant-torch-9360.firebaseio.com/users.json',
+						type : 'GET',
+						dataType : 'json',
+               			success : function(data){
+ 							console.log('users successfully retrieved ', data);
+                }
+			});
+				})
+              
+			}
+	</script> 
+</BODY>
+
+</HTML>
