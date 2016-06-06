@@ -12,7 +12,9 @@ module.exports = function (grunt) {
             },
             main: {
                 src: [
-                    'src/init.js'
+                     'src/init.js',
+                     'src/**/*.js',
+
                 ],
                 dest: 'dist/js/main.js'
             },
