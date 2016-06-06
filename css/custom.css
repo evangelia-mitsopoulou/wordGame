@@ -1,0 +1,28 @@
+body {
+	background-color:#484545;
+}
+
+h2 {
+	color:white;
+}
+
+.container {
+	width:40%;
+	border:1px solid #908F8F;
+	height:22em;
+	background-color:black;
+	margin-top:15%;
+}
+
+.col-md-6 {
+	position:relative;
+	top:20%;
+}
+
+.btn {
+margin-bottom:15px;
+}
+
+.txt {
+	font-weight:300;
+}
