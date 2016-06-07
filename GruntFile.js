@@ -13,6 +13,7 @@ module.exports = function (grunt) {
             main: {
                 src: [
                      'src/init.js',
+                     'src/home/listWordsService.js',
                      'src/**/*.js',
 
                 ],
