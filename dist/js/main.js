@@ -19,17 +19,16 @@ wordApp.config(function($routeProvider){
 window.wordApp.WordsService = function($http){
 
 	var _this =this;
+	_this.recentMangledWords = []; //it improves the randomness
 
 	var shuffleWordsLetters = function(){
 		 for (var i=0; i<=_this.words .length-1;i++){
-
 		 var shuffledWord = _this.words[i].split('');
 		 console.log('shuffled word', shuffledWord);
 		 var currentIndex = shuffledWord.length, temporaryValue, randomIndex;
 
   		// While there remain elements to shuffle...
   		while (0 !== currentIndex) {
-
     	// Pick a remaining element...
     	randomIndex = Math.floor(Math.random() * currentIndex);
    		currentIndex -= 1;
@@ -44,6 +43,20 @@ window.wordApp.WordsService = function($http){
 		console.log('shuffle list', _this.words);
 	};
 
+    /* A helper method that empties and resets the most 
+     * recent used mangled words list
+     *  Max size of the array is 3 
+     */
+
+    var updateRecentMangledWords = function(randomWord){
+    	if (_this.recentMangledWords.length < 2) {
+    		_this.recentMangledWords.push(randomWord);
+    	} else {
+            _this.recentMangledWords.shift();
+            _this.recentMangledWords.push(randomWord);
+    	}
+    };
+
 	this.getWordsList = function(){
 		return $http.get('https://brilliant-torch-9360.firebaseio.com/words.json');
 	};
@@ -55,22 +68,26 @@ window.wordApp.WordsService = function($http){
 	};
 
 	this.getRandomWord = function(){
-		return _this.words [Math.floor(Math.random()*_this.words .length)];
+        var randomWord = _this.words [Math.floor(Math.random()*_this.words .length)];
+        if (randomWord in _this.recentMangledWords)  {
+        	this.getRandomWord(); 
+        } else {
+        	updateRecentMangledWords(randomWord);
+        	return randomWord;
+        }		
 	};
+
 };
 window.wordApp.WordsService.$inject = ['$http'];
 window.wordApp.service('WordsService', window.wordApp.WordsService);
 
 
 
-window.wordApp.homeController = function($scope, WordsService){
+window.wordApp.homeController = function($scope, WordsService,pubsub){
+	
 	$scope.init = function(){
-
-       //pubsub.addListener("wordsListReceived", $scope, onGetMediaHandler);
-
-		WordsService.getWordsList()
+    	WordsService.getWordsList()
 		.then(function(res){
-			//pubsub.addObserver("wordsListReceived", res.data);
 			WordsService.setWordList(res.data);
 		}, function(){
 			console.log('data failed');	
@@ -78,13 +95,14 @@ window.wordApp.homeController = function($scope, WordsService){
 	};
 
 	$scope.start = function(){
-		WordsService.getRandomWord();
+		var rWord=WordsService.getRandomWord();
+		pubsub.addObserver("firstMangledWord", rWord);
 	};
 
 	$scope.viewScores = function(){};
 };
 
-window.wordApp.homeController.$inject = ['$scope', 'WordsService'];
+window.wordApp.homeController.$inject = ['$scope', 'WordsService', 'pubsubProvider'];
 window.wordApp.controller('homeController', window.wordApp.homeController);
 window.wordApp.controller('scoresListController',['$scope', function($scope){
 	$scope.backToStart = function(){};
@@ -123,6 +141,32 @@ window.wordApp.factory("pubsubProvider", window.wordApp.pubsubProvider);
 
 
 
-window.wordApp.controller('wordEntryController',['$scope', function($scope){
+ window.wordAp.wordEntryController = function($scope, WordsService,pubsub){
+	$scope.model = {};
+
+	$scope.init = function(){
+		pubsub.addListener("wordsListReceived", $scope, onGetFirstMangledHandler);
+	};
+   
 	$scope.submit = function(){};
-}]);
+
+	$scope.refresh = function(){
+       WordsService.getRandomWord();
+	};
+
+    function onGetFirstMangledHandler(data){
+       $scope.model.mangledWord = data;
+    }
+};
+
+window.wordApp.homeController.$inject = ['$scope', 'WordsService', 'pubsubProvider'];
+window.wordApp.controller('wordEntryController', window.wordAp.wordEntryController);
+window.wordApp.wordEntry = function(){
+	 return {
+      restrict: 'AE',
+      template: '<h3>Word Entry</h3>'
+  };
+};
+
+//window.wordApp.wordEntry.$inject = ['$scope', 'WordsService'];
+window.wordApp.directive('wordEntry', window.wordApp.wordEntry);
