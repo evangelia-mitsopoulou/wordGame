@@ -1,11 +1,8 @@
-window.wordApp.homeController = function($scope, WordsService){
+window.wordApp.homeController = function($scope, WordsService,pubsub){
+	
 	$scope.init = function(){
-
-       //pubsub.addListener("wordsListReceived", $scope, onGetMediaHandler);
-
-		WordsService.getWordsList()
+    	WordsService.getWordsList()
 		.then(function(res){
-			//pubsub.addObserver("wordsListReceived", res.data);
 			WordsService.setWordList(res.data);
 		}, function(){
 			console.log('data failed');	
@@ -13,11 +10,12 @@ window.wordApp.homeController = function($scope, WordsService){
 	};
 
 	$scope.start = function(){
-		WordsService.getRandomWord();
+		var rWord=WordsService.getRandomWord();
+		pubsub.addObserver("firstMangledWord", rWord);
 	};
 
 	$scope.viewScores = function(){};
 };
 
-window.wordApp.homeController.$inject = ['$scope', 'WordsService'];
+window.wordApp.homeController.$inject = ['$scope', 'WordsService', 'pubsubProvider'];
 window.wordApp.controller('homeController', window.wordApp.homeController);
