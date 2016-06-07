@@ -21,8 +21,6 @@ window.wordApp.WordsService = function($http){
 	var _this =this;
 
 	var shuffleWordsLetters = function(){
-		 console.log('in shuffle words', _this.words);
-		 
 		 for (var i=0; i<=_this.words .length-1;i++){
 
 		 var shuffledWord = _this.words[i].split('');
@@ -40,19 +38,11 @@ window.wordApp.WordsService = function($http){
     	temporaryValue = shuffledWord[currentIndex];
    		shuffledWord[currentIndex] = shuffledWord[randomIndex];
     	shuffledWord[randomIndex] = temporaryValue;
-
-	  	   }
-         console.log('shuffled word later ',shuffledWord);
-    	 //shuffledWord.join();
-	  
-         _this.words[i] = shuffledWord.join(' ').toString();
-		 }
-console.log('shuffle list', _this.words);
-
-
+	  	}
+         _this.words[i] = shuffledWord.join('').toString();
+		 }		
+		console.log('shuffle list', _this.words);
 	};
-
-
 
 	this.getWordsList = function(){
 		return $http.get('https://brilliant-torch-9360.firebaseio.com/words.json');
@@ -62,6 +52,10 @@ console.log('shuffle list', _this.words);
 	this.setWordList = function(wordList){
 		_this.words = wordList;
 		shuffleWordsLetters();
+	};
+
+	this.getRandomWord = function(){
+		return _this.words [Math.floor(Math.random()*_this.words .length)];
 	};
 };
 window.wordApp.WordsService.$inject = ['$http'];
@@ -83,7 +77,9 @@ window.wordApp.homeController = function($scope, WordsService){
 		});
 	};
 
-	$scope.start = function(){};
+	$scope.start = function(){
+		WordsService.getRandomWord();
+	};
 
 	$scope.viewScores = function(){};
 };

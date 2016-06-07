@@ -12,7 +12,9 @@ window.wordApp.homeController = function($scope, WordsService){
 		});
 	};
 
-	$scope.start = function(){};
+	$scope.start = function(){
+		WordsService.getRandomWord();
+	};
 
 	$scope.viewScores = function(){};
 };
