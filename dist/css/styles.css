@@ -6759,10 +6759,6 @@ button.close {
 }
 /*# sourceMappingURL=bootstrap.css.map */
 
-body {
-	background-color:#484545;
-}
-
 h2 {
 	color:white;
 }
@@ -6771,7 +6767,7 @@ h2 {
 	width:40%;
 	border:1px solid #908F8F;
 	height:22em;
-	background-color:black;
+	background-color:#464343;
 	margin-top:15%;
 }
 
