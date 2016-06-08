@@ -156,7 +156,7 @@ window.wordApp.factory("pubsubProvider", window.wordApp.pubsubProvider);
         	 seconds = seconds < 10 ? "0" + seconds : seconds;
              display.textContent =  "00:" + seconds;
         if (--timer < 0) {
-            timer = duration;
+            timer = 0;
        	 }
     	}, 1000);
 	}
@@ -166,7 +166,7 @@ window.wordApp.factory("pubsubProvider", window.wordApp.pubsubProvider);
        $scope.model.show = true;
 
         //start the counter
-	    var fortySeconds = 40,
+	    var fortySeconds = 4,
         display = document.querySelector('#counter');
     	startTimer(fortySeconds, display);
        
