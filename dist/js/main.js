@@ -4,7 +4,7 @@ var wordApp = angular.module('wordGame',['ngRoute']);
 wordApp.config(function($routeProvider){	
 	$routeProvider
 	.when('/', {
-                templateUrl : 'src/home/homeView.html',
+                templateUrl : 'src/index.html',
                 controller  : 'homeController'
             })
 	.when('/scores', {
@@ -85,7 +85,9 @@ window.wordApp.service('WordsService', window.wordApp.WordsService);
 
 window.wordApp.homeController = function($scope, WordsService,pubsub){
 	
+	
 	$scope.init = function(){
+		$scope.model = {show:true};
     	WordsService.getWordsList()
 		.then(function(res){
 			WordsService.setWordList(res.data);
@@ -95,6 +97,7 @@ window.wordApp.homeController = function($scope, WordsService,pubsub){
 	};
 
 	$scope.start = function(){
+		$scope.model.show = false; 
 		var rWord=WordsService.getRandomWord();
 		pubsub.addObserver("firstMangledWord", rWord);
 	};
@@ -141,11 +144,18 @@ window.wordApp.factory("pubsubProvider", window.wordApp.pubsubProvider);
 
 
 
- window.wordAp.wordEntryController = function($scope, WordsService,pubsub){
-	$scope.model = {};
+ window.wordApp.wordEntryController = function($scope, WordsService,pubsub){
+	$scope.model = {show : false};
+
+     var onGetFirstMangledHandler = function(data){
+       $scope.model.mangledWord = data;
+       $scope.model.show = true;
+       
+    };
 
 	$scope.init = function(){
-		pubsub.addListener("wordsListReceived", $scope, onGetFirstMangledHandler);
+		console.log('on');
+		pubsub.addListener("firstMangledWord", $scope, onGetFirstMangledHandler);
 	};
    
 	$scope.submit = function(){};
@@ -153,18 +163,15 @@ window.wordApp.factory("pubsubProvider", window.wordApp.pubsubProvider);
 	$scope.refresh = function(){
        WordsService.getRandomWord();
 	};
-
-    function onGetFirstMangledHandler(data){
-       $scope.model.mangledWord = data;
-    }
 };
 
-window.wordApp.homeController.$inject = ['$scope', 'WordsService', 'pubsubProvider'];
-window.wordApp.controller('wordEntryController', window.wordAp.wordEntryController);
+window.wordApp.wordEntryController.$inject = ['$scope', 'WordsService', 'pubsubProvider'];
+window.wordApp.controller('wordEntryController', window.wordApp.wordEntryController);
 window.wordApp.wordEntry = function(){
 	 return {
       restrict: 'AE',
-      template: '<h3>Word Entry</h3>'
+      scope: false,
+      template: '<h3>Word Entry</h3> <div> {{model.mangledWord}}  <div> <input type="text"></input>'
   };
 };
 

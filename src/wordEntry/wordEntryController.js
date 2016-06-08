@@ -1,8 +1,15 @@
- window.wordAp.wordEntryController = function($scope, WordsService,pubsub){
-	$scope.model = {};
+ window.wordApp.wordEntryController = function($scope, WordsService,pubsub){
+	$scope.model = {show : false};
+
+     var onGetFirstMangledHandler = function(data){
+       $scope.model.mangledWord = data;
+       $scope.model.show = true;
+       
+    };
 
 	$scope.init = function(){
-		pubsub.addListener("wordsListReceived", $scope, onGetFirstMangledHandler);
+		console.log('on');
+		pubsub.addListener("firstMangledWord", $scope, onGetFirstMangledHandler);
 	};
    
 	$scope.submit = function(){};
@@ -10,11 +17,7 @@
 	$scope.refresh = function(){
        WordsService.getRandomWord();
 	};
-
-    function onGetFirstMangledHandler(data){
-       $scope.model.mangledWord = data;
-    }
 };
 
-window.wordApp.homeController.$inject = ['$scope', 'WordsService', 'pubsubProvider'];
-window.wordApp.controller('wordEntryController', window.wordAp.wordEntryController);
+window.wordApp.wordEntryController.$inject = ['$scope', 'WordsService', 'pubsubProvider'];
+window.wordApp.controller('wordEntryController', window.wordApp.wordEntryController);

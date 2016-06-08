@@ -12,7 +12,19 @@
   </head>
 
   <body ng-app="wordGame">
-    <div ng-view></div>
+    <div id="container" class="container" ng-controller= "homeController" ng-init="init()" ng-show = "model.show">
+    <h2 class="txt text-center">Word Game</h2>
+    <div class="col-md-6 col-sm-offset-3">
+    <a class="btn btn-default btn-block" ng-click="start()">Start </a>
+    </div>
+    <div class="col-md-6 col-sm-offset-3">
+    <a class="btn btn-default btn-block" href="#/scores"> High Score List </a> </div>
+</div>
+
+<div ng-controller="wordEntryController" ng-init="init()" ng-show = "model.show">
+<word-entry> </word-entry>
+</div>
+
    <script type="text/javascript" src="dist/js/libs.js"></script>
    <script type="text/javascript" src="dist/js/main.js"></script>
   </body>

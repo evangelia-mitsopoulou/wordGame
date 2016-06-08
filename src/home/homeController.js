@@ -1,6 +1,8 @@
 window.wordApp.homeController = function($scope, WordsService,pubsub){
 	
+	
 	$scope.init = function(){
+		$scope.model = {show:true};
     	WordsService.getWordsList()
 		.then(function(res){
 			WordsService.setWordList(res.data);
@@ -10,6 +12,7 @@ window.wordApp.homeController = function($scope, WordsService,pubsub){
 	};
 
 	$scope.start = function(){
+		$scope.model.show = false; 
 		var rWord=WordsService.getRandomWord();
 		pubsub.addObserver("firstMangledWord", rWord);
 	};
