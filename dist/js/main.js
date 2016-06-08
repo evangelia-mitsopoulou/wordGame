@@ -143,12 +143,11 @@ window.wordApp.pubsubProvider.$inject = ['$rootScope'];
 window.wordApp.factory("pubsubProvider", window.wordApp.pubsubProvider);
 
 
+window.wordApp.SaveScoreService= function(){
 
- window.wordApp.wordEntryController = function($scope, WordsService,pubsub){
-	$scope.model = {show : false};
-
-	function startTimer(duration, display) {
-    	var timer = duration, minutes, seconds;
+  this.StartTimer = function(duration, display){
+  
+	   var timer = duration, minutes, seconds;
    			 setInterval(function () {
        		 minutes = parseInt(timer / 60, 10);
        		 seconds = parseInt(timer % 60, 10);
@@ -159,17 +158,32 @@ window.wordApp.factory("pubsubProvider", window.wordApp.pubsubProvider);
             timer = 0;
        	 }
     	}, 1000);
-	}
+       
+  };
+  
+  this.calculateScore = function(){
+
+  };
+
+
+  this.submitScore = function(){
+
+  };
+
+};
+//window.wordApp.WordsService.$inject = ['$http'];
+window.wordApp.service('SaveScoreService', window.wordApp.SaveScoreService);
+ window.wordApp.wordEntryController = function($scope, WordsService,SaveScoreService,pubsub){
+	$scope.model = {show : false};
+
+	
 
      var onGetFirstMangledHandler = function(data){
        $scope.model.mangledWord = data;
        $scope.model.show = true;
-
-        //start the counter
-	    var fortySeconds = 4,
+        var fortySeconds = 10,
         display = document.querySelector('#counter');
-    	startTimer(fortySeconds, display);
-       
+    	SaveScoreService.StartTimer(fortySeconds, display);
     };
 
 	$scope.init = function(){
@@ -183,7 +197,7 @@ window.wordApp.factory("pubsubProvider", window.wordApp.pubsubProvider);
 	};
 };
 
-window.wordApp.wordEntryController.$inject = ['$scope', 'WordsService', 'pubsubProvider'];
+window.wordApp.wordEntryController.$inject = ['$scope', 'WordsService', 'SaveScoreService','pubsubProvider'];
 window.wordApp.controller('wordEntryController', window.wordApp.wordEntryController);
 window.wordApp.wordEntry = function(){
 	 return {
