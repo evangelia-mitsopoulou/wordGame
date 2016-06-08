@@ -6780,6 +6780,37 @@ h2 {
 margin-bottom:15px;
 }
 
-.txt {
+.txt,  .page-header h2{
 	font-weight:300;
+}
+
+.page-header {
+background-color:#464343;
+margin-top:-20px;
+padding:10px;	
+}
+
+.page-header h2 {
+	color:white;
+}
+
+.mangledWord, p {
+	margin: 0 auto;
+	text-align: center;	
+}
+
+.mangledWord {
+	font-size: 25px;
+	font-weight:500;
+	letter-spacing:10px;
+}
+
+p {
+	font-size:16px;
+	font-style: italic;
+}
+
+.inputContainer {
+	width:30%;
+	margin:50px auto;
 }
