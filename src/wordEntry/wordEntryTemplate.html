@@ -1,11 +1,12 @@
 <div class = "page-header"> <h2>Word Game App</h2>
 </div> 
 
-<div class="mangledWord"> {{model.mangledWord}} </div> 
-<p> What is the unmangled word? </p>
+<div class="txt"> {{model.mangledWord}} </div> 
+<p class="txt"> What is the unmangled word? </p>
 <div class="inputContainer">
 <input type="text" class="form-control" placeholder = "Insert your Name"></input>
 <input type="text" class="form-control" placeholder = "Type the correct word"></input>
 <a class="btn btn-primary btn-block disabled" ng-click="start()">Submit </a>
 </div>
+<div class="txt" id="counter">00:40</div>
 
