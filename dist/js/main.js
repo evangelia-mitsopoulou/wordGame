@@ -170,10 +170,8 @@ window.wordApp.controller('wordEntryController', window.wordApp.wordEntryControl
 window.wordApp.wordEntry = function(){
 	 return {
       restrict: 'AE',
-      scope: false,
-      template: '<h3>Word Entry</h3> <div> {{model.mangledWord}}  <div> <input type="text"></input>'
+      templateUrl: 'src/wordEntry/WordEntryTemplate.html'
   };
 };
 
-//window.wordApp.wordEntry.$inject = ['$scope', 'WordsService'];
 window.wordApp.directive('wordEntry', window.wordApp.wordEntry);
