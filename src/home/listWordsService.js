@@ -1,4 +1,4 @@
-window.wordApp.WordsService = function($http){
+window.wordApp.WordsService = function($http, config){
 
 	var _this =this;
 	_this.recentMangledWords = []; //it improves the randomness
@@ -40,7 +40,7 @@ window.wordApp.WordsService = function($http){
     };
 
 	this.getWordsList = function(){
-		return $http.get('https://brilliant-torch-9360.firebaseio.com/words.json');
+		return $http.get(config.WordsListUrl);
 	};
 
 
@@ -60,7 +60,7 @@ window.wordApp.WordsService = function($http){
 	};
 
 };
-window.wordApp.WordsService.$inject = ['$http'];
+window.wordApp.WordsService.$inject = ['$http', 'Configuration'];
 window.wordApp.service('WordsService', window.wordApp.WordsService);
 
 

@@ -1,22 +1,10 @@
-var wordApp = angular.module('wordGame',['ngRoute']);
+var wordApp = angular.module('wordGame',[ ]);
  
-
-wordApp.config(function($routeProvider){	
-	$routeProvider
-	.when('/', {
-                templateUrl : 'src/index.html',
-                controller  : 'homeController'
-            })
-	.when('/scores', {
-                templateUrl : 'src/scoreList/scoresListView.html',
-                controller  : 'scoresListController'
-            })
-	.when('/word-entry', {
-                templateUrl : 'src/wordEntry/wordEntryView.html',
-                controller  : 'wordEntryController'
-            });
- });
-window.wordApp.WordsService = function($http){
+wordApp.constant('Configuration', {
+    WordsListUrl : 'https://brilliant-torch-9360.firebaseio.com/words.json',
+    UsersUrl : 'https://brilliant-torch-9360.firebaseio.com/users.json'
+});
+window.wordApp.WordsService = function($http, config){
 
 	var _this =this;
 	_this.recentMangledWords = []; //it improves the randomness
@@ -58,7 +46,7 @@ window.wordApp.WordsService = function($http){
     };
 
 	this.getWordsList = function(){
-		return $http.get('https://brilliant-torch-9360.firebaseio.com/words.json');
+		return $http.get(config.WordsListUrl);
 	};
 
 
@@ -78,14 +66,13 @@ window.wordApp.WordsService = function($http){
 	};
 
 };
-window.wordApp.WordsService.$inject = ['$http'];
+window.wordApp.WordsService.$inject = ['$http', 'Configuration'];
 window.wordApp.service('WordsService', window.wordApp.WordsService);
 
 
 
-window.wordApp.homeController = function($scope, WordsService,pubsub){
-	
-	
+window.wordApp.homeController = function($scope, WordsService,SaveScoreService,pubsub){
+
 	$scope.init = function(){
 		$scope.model = {show:true};
     	WordsService.getWordsList()
@@ -102,13 +89,22 @@ window.wordApp.homeController = function($scope, WordsService,pubsub){
 		pubsub.addObserver("firstMangledWord", rWord);
 	};
 
-	$scope.viewScores = function(){};
+	$scope.viewScores = function(){
+		SaveScoreService.getScoreList().then(function(res){
+		pubsub.addObserver("scoreListReceived", res.data);
+		},function(){
+		});
+	};
 };
 
-window.wordApp.homeController.$inject = ['$scope', 'WordsService', 'pubsubProvider'];
+window.wordApp.homeController.$inject = ['$scope', 'WordsService','SaveScoreService','pubsubProvider'];
 window.wordApp.controller('homeController', window.wordApp.homeController);
 window.wordApp.controller('scoresListController',['$scope', function($scope){
 	$scope.backToStart = function(){};
+	$scope.init = function(){
+
+	};
+
 }]);
 
 window.wordApp.pubsubProvider = function($rootScope){
@@ -142,11 +138,11 @@ window.wordApp.pubsubProvider = function($rootScope){
 window.wordApp.pubsubProvider.$inject = ['$rootScope'];
 window.wordApp.factory("pubsubProvider", window.wordApp.pubsubProvider);
 
+window.wordApp.SaveScoreService= function($http, config,pubsub){
 
-window.wordApp.SaveScoreService= function(){
+  var _this = this;
 
   this.StartTimer = function(duration, display){
-  
 	   var timer = duration, minutes, seconds;
    			 setInterval(function () {
        		 minutes = parseInt(timer / 60, 10);
@@ -156,45 +152,116 @@ window.wordApp.SaveScoreService= function(){
              display.textContent =  "00:" + seconds;
         if (--timer < 0) {
             timer = 0;
+            pubsub.addObserver("timeout","test");
        	 }
-    	}, 1000);
-       
+    	}, 1000);     
   };
   
-  this.calculateScore = function(){
 
+  this.submitScore = function(data){
+     return $http.post(config.UsersUrl, data);
   };
 
 
-  this.submitScore = function(){
+ this.getMaxScore = function(wordLength){
+    var x= wordLength/3;
+    var maxScore = Math.floor(Math.pow(1.95, x));
+    _this.maxScore = maxScore;
+    return maxScore;
+ };
 
-  };
+ this.getScoreList = function(){
+     return $http.get(config.UsersUrl);
+ };
+
 
 };
-//window.wordApp.WordsService.$inject = ['$http'];
+window.wordApp.SaveScoreService.$inject = ['$http','Configuration','pubsubProvider'];
 window.wordApp.service('SaveScoreService', window.wordApp.SaveScoreService);
  window.wordApp.wordEntryController = function($scope, WordsService,SaveScoreService,pubsub){
 	$scope.model = {show : false};
+  $scope.model.modal = false;
+    
+ function onTimeoutHandler(data){
+    console.log('time out reacher', data);
+    $scope.model.modal = true;
+ }
 
-	
+  function calculateScore (elWord){
+    var score;
+     if (elWord === $scope.model.mangledWord && $scope.deleteCounter ===0) {
+      score = SaveScoreService.getMaxScore();
+      } else {
+      score = $scope.model.maxscore - $scope.deleteCounter;
+      if (score < 0) {
+      score = 0;
+      }
+    }
+    return score;
+  }
+
 
      var onGetFirstMangledHandler = function(data){
        $scope.model.mangledWord = data;
        $scope.model.show = true;
-        var fortySeconds = 10,
-        display = document.querySelector('#counter');
-    	SaveScoreService.StartTimer(fortySeconds, display);
+       $scope.model.score = 0;
+       $scope.model.maxscore = SaveScoreService.getMaxScore(data.length);
+       console.log('max score ', $scope.model.maxscore);
+       var fortySeconds = 10,
+       display = document.querySelector('#counter');
+       SaveScoreService.StartTimer(fortySeconds, display);
     };
+   
+   $scope.$watch('name', function(){
+   	var val;
+   	var elName = document.getElementById('Name');
+   	var elSubmit = document.getElementById('Submit');
+   		if (elName!== null){
+   		val=elName.value;
+   		if (val.length >1 && elSubmit.hasAttribute("disabled") === true) {
+   			elSubmit.removeAttribute("disabled");
+   		}
+   	}
+   });
+
+    $scope.$watch('word', function(){
+   	var val;
+   	var elWord = document.getElementById('Word');
+    
+   	if (elWord !== null) {
+         val = elWord.value;
+         if (val.length >1 && $scope.previousLength < val.length) {
+         $scope.previousLength=val.length;      
+        } else if (val.length >1 &&  $scope.previousLength >= val.length) {
+            $scope.deleteCounter= $scope.deleteCounter + 1; 
+            $scope.previousLength=val.length;
+        }
+   	}
+    console.log( 'delete counter', $scope.deleteCounter);
+   });
 
 	$scope.init = function(){
+    $scope.previousLength = 0; 
+    $scope.deleteCounter = 0;
 		pubsub.addListener("firstMangledWord", $scope, onGetFirstMangledHandler);
+    pubsub.addListener("timeout",$scope,onTimeoutHandler);
 	};
    
-	$scope.submit = function(){};
+	$scope.submit = function(){
+    var elWordValue=document.getElementById('Word').value;
+    var score=calculateScore(elWordValue);
+    $scope.model.score = score;
+    var username = document.getElementById('Name').value;
+    var data={name:username, score:score};
+		SaveScoreService.submitScore(data).then(function(res){
+      console.log('data successfully submitted', res);
+    },function(){});
+	};
 
 	$scope.refresh = function(){
        WordsService.getRandomWord();
 	};
+
 };
 
 window.wordApp.wordEntryController.$inject = ['$scope', 'WordsService', 'SaveScoreService','pubsubProvider'];

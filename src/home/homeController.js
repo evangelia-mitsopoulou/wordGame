@@ -1,6 +1,5 @@
-window.wordApp.homeController = function($scope, WordsService,pubsub){
-	
-	
+window.wordApp.homeController = function($scope, WordsService,SaveScoreService,pubsub){
+
 	$scope.init = function(){
 		$scope.model = {show:true};
     	WordsService.getWordsList()
@@ -17,8 +16,13 @@ window.wordApp.homeController = function($scope, WordsService,pubsub){
 		pubsub.addObserver("firstMangledWord", rWord);
 	};
 
-	$scope.viewScores = function(){};
+	$scope.viewScores = function(){
+		SaveScoreService.getScoreList().then(function(res){
+		pubsub.addObserver("scoreListReceived", res.data);
+		},function(){
+		});
+	};
 };
 
-window.wordApp.homeController.$inject = ['$scope', 'WordsService', 'pubsubProvider'];
+window.wordApp.homeController.$inject = ['$scope', 'WordsService','SaveScoreService','pubsubProvider'];
 window.wordApp.controller('homeController', window.wordApp.homeController);
