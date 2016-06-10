@@ -1,7 +1,30 @@
-window.wordApp.controller('homeController',['$scope', function($scope){
+window.wordApp.homeController = function($scope, WordsService,SaveScoreService,pubsub){
 
-	$scope.start = function(){};
+	$scope.init = function(){
+		$scope.model = {show:true};
+    	WordsService.getWordsList()
+		.then(function(res){
+			WordsService.setWordList(res.data);
+		}, function(){
+			console.log('data failed');	
+		});
+	};
 
-	$scope.viewScores = function(){};
+	$scope.start = function(){
+		$scope.model.show = false; 
+		var rWord=WordsService.getRandomWord();
+		pubsub.addObserver("firstMangledWord", rWord);
+	};
 
-}]);
+	$scope.viewScores = function(){
+		$scope.model.show = false; 
+		SaveScoreService.getScoreList().then(function(res){
+		pubsub.addObserver("scoreListReceived", res.data);
+		},function(){
+			console.log('score list data not received');
+		});
+	};
+};
+
+window.wordApp.homeController.$inject = ['$scope', 'WordsService','SaveScoreService','pubsubProvider'];
+window.wordApp.controller('homeController', window.wordApp.homeController);

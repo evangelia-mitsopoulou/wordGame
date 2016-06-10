@@ -5,14 +5,18 @@ module.exports = function (grunt) {
              libs: {
                 src: [
                     'bower_components/jquery/dist/jquery.js',
+                    'bower_components/bootstrap/dist/js/bootstrap.js',
                     'bower_components/angular/angular.js',
-                    'bower_components/angular-route/angular-route.js'              
+                    'bower_components/angular-route/angular-route.js',
+                    'bower_components/angular-modal-service/dst/angular-modal-service.js'             
                 ],
                 dest: 'dist/js/libs.js'
             },
             main: {
                 src: [
                      'src/init.js',
+                     'src/home/listWordsService.js',
+                     'src/wordEntry/saveScoreService.js',
                      'src/**/*.js',
 
                 ],

@@ -1,18 +1,6 @@
-var wordApp = angular.module('wordGame',['ngRoute']);
+var wordApp = angular.module('wordGame',['angularModalService']);
  
-
-wordApp.config(function($routeProvider){	
-	$routeProvider
-	.when('/', {
-                templateUrl : 'src/home/homeView.html',
-                controller  : 'homeController'
-            })
-	.when('/scores', {
-                templateUrl : 'src/scoreList/scoresListView.html',
-                controller  : 'scoresListController'
-            })
-	.when('/word-entry', {
-                templateUrl : 'src/wordEntry/wordEntryView.html',
-                controller  : 'wordEntryController'
-            });
- });
+wordApp.constant('Configuration', {
+    WordsListUrl : 'https://brilliant-torch-9360.firebaseio.com/words.json',
+    UsersUrl : 'https://brilliant-torch-9360.firebaseio.com/users.json'
+});
