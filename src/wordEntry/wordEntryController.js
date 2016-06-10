@@ -1,10 +1,18 @@
- window.wordApp.wordEntryController = function($scope, WordsService,SaveScoreService,pubsub){
+ /*jshint maxparams: 6 */
+ window.wordApp.wordEntryController = function($scope, WordsService,SaveScoreService,pubsub,ModalService){
 	$scope.model = {show : false};
   $scope.model.modal = false;
-    
+
  function onTimeoutHandler(data){
     console.log('time out reacher', data);
-    $scope.model.modal = true;
+
+         ModalService.showModal({
+           templateUrl: 'src/shared/modal.html',
+            controller: "ModalController"
+    });
+         document.getElementById('Name').setAttribute('disabled', true);
+         document.getElementById('Word').setAttribute('disabled', true);
+         document.getElementById('Submit').setAttribute('disabled', true);
  }
 
   function calculateScore (elWord){
@@ -27,10 +35,18 @@
        $scope.model.score = 0;
        $scope.model.maxscore = SaveScoreService.getMaxScore(data.length);
        console.log('max score ', $scope.model.maxscore);
-       var fortySeconds = 10,
+       var fortySeconds = 3,
        display = document.querySelector('#counter');
        SaveScoreService.StartTimer(fortySeconds, display);
     };
+
+  $scope.init = function(){
+    $scope.previousLength = 0; 
+    $scope.deleteCounter = 0;
+     $scope.timerOut=false;
+    pubsub.addListener("firstMangledWord", $scope, onGetFirstMangledHandler);
+    pubsub.addListener("timeout",$scope,onTimeoutHandler);
+  };
    
    $scope.$watch('name', function(){
    	var val;
@@ -60,12 +76,7 @@
     console.log( 'delete counter', $scope.deleteCounter);
    });
 
-	$scope.init = function(){
-    $scope.previousLength = 0; 
-    $scope.deleteCounter = 0;
-		pubsub.addListener("firstMangledWord", $scope, onGetFirstMangledHandler);
-    pubsub.addListener("timeout",$scope,onTimeoutHandler);
-	};
+
    
 	$scope.submit = function(){
     var elWordValue=document.getElementById('Word').value;
@@ -84,5 +95,11 @@
 
 };
 
-window.wordApp.wordEntryController.$inject = ['$scope', 'WordsService', 'SaveScoreService','pubsubProvider'];
+window.wordApp.wordEntryController.$inject = ['$scope', 'WordsService', 'SaveScoreService','pubsubProvider', 'ModalService'];
 window.wordApp.controller('wordEntryController', window.wordApp.wordEntryController);
+
+window.wordApp.controller('ModalController', function ($scope, close) {
+   $scope.close = function(result) {
+  close(result, 500); // close, but give 500ms for bootstrap to animate
+ };
+});

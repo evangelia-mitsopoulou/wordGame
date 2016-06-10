@@ -4,7 +4,7 @@ window.wordApp.SaveScoreService= function($http, config,pubsub){
 
   this.StartTimer = function(duration, display){
 	   var timer = duration, minutes, seconds;
-   			 setInterval(function () {
+   			var refreshId = setInterval(function () {
        		 minutes = parseInt(timer / 60, 10);
        		 seconds = parseInt(timer % 60, 10);
         	 minutes = minutes < 10 ? "0" + minutes : minutes;
@@ -12,8 +12,11 @@ window.wordApp.SaveScoreService= function($http, config,pubsub){
              display.textContent =  "00:" + seconds;
         if (--timer < 0) {
             timer = 0;
-            pubsub.addObserver("timeout","test");
+            pubsub.addObserver("timeout","test");     
+             clearInterval(refreshId);
        	 }
+      
+        
     	}, 1000);     
   };
   

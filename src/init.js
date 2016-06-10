@@ -1,4 +1,4 @@
-var wordApp = angular.module('wordGame',[ ]);
+var wordApp = angular.module('wordGame',['angularModalService']);
  
 wordApp.constant('Configuration', {
     WordsListUrl : 'https://brilliant-torch-9360.firebaseio.com/words.json',

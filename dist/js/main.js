@@ -1,4 +1,4 @@
-var wordApp = angular.module('wordGame',[ ]);
+var wordApp = angular.module('wordGame',['angularModalService']);
  
 wordApp.constant('Configuration', {
     WordsListUrl : 'https://brilliant-torch-9360.firebaseio.com/words.json',
@@ -144,7 +144,7 @@ window.wordApp.SaveScoreService= function($http, config,pubsub){
 
   this.StartTimer = function(duration, display){
 	   var timer = duration, minutes, seconds;
-   			 setInterval(function () {
+   			var refreshId = setInterval(function () {
        		 minutes = parseInt(timer / 60, 10);
        		 seconds = parseInt(timer % 60, 10);
         	 minutes = minutes < 10 ? "0" + minutes : minutes;
@@ -152,8 +152,11 @@ window.wordApp.SaveScoreService= function($http, config,pubsub){
              display.textContent =  "00:" + seconds;
         if (--timer < 0) {
             timer = 0;
-            pubsub.addObserver("timeout","test");
+            pubsub.addObserver("timeout","test");     
+             clearInterval(refreshId);
        	 }
+      
+        
     	}, 1000);     
   };
   
@@ -178,13 +181,21 @@ window.wordApp.SaveScoreService= function($http, config,pubsub){
 };
 window.wordApp.SaveScoreService.$inject = ['$http','Configuration','pubsubProvider'];
 window.wordApp.service('SaveScoreService', window.wordApp.SaveScoreService);
- window.wordApp.wordEntryController = function($scope, WordsService,SaveScoreService,pubsub){
+ /*jshint maxparams: 6 */
+ window.wordApp.wordEntryController = function($scope, WordsService,SaveScoreService,pubsub,ModalService){
 	$scope.model = {show : false};
   $scope.model.modal = false;
-    
+
  function onTimeoutHandler(data){
     console.log('time out reacher', data);
-    $scope.model.modal = true;
+
+         ModalService.showModal({
+           templateUrl: 'src/shared/modal.html',
+            controller: "ModalController"
+    });
+         document.getElementById('Name').setAttribute('disabled', true);
+         document.getElementById('Word').setAttribute('disabled', true);
+         document.getElementById('Submit').setAttribute('disabled', true);
  }
 
   function calculateScore (elWord){
@@ -207,10 +218,18 @@ window.wordApp.service('SaveScoreService', window.wordApp.SaveScoreService);
        $scope.model.score = 0;
        $scope.model.maxscore = SaveScoreService.getMaxScore(data.length);
        console.log('max score ', $scope.model.maxscore);
-       var fortySeconds = 10,
+       var fortySeconds = 3,
        display = document.querySelector('#counter');
        SaveScoreService.StartTimer(fortySeconds, display);
     };
+
+  $scope.init = function(){
+    $scope.previousLength = 0; 
+    $scope.deleteCounter = 0;
+     $scope.timerOut=false;
+    pubsub.addListener("firstMangledWord", $scope, onGetFirstMangledHandler);
+    pubsub.addListener("timeout",$scope,onTimeoutHandler);
+  };
    
    $scope.$watch('name', function(){
    	var val;
@@ -240,12 +259,7 @@ window.wordApp.service('SaveScoreService', window.wordApp.SaveScoreService);
     console.log( 'delete counter', $scope.deleteCounter);
    });
 
-	$scope.init = function(){
-    $scope.previousLength = 0; 
-    $scope.deleteCounter = 0;
-		pubsub.addListener("firstMangledWord", $scope, onGetFirstMangledHandler);
-    pubsub.addListener("timeout",$scope,onTimeoutHandler);
-	};
+
    
 	$scope.submit = function(){
     var elWordValue=document.getElementById('Word').value;
@@ -264,8 +278,15 @@ window.wordApp.service('SaveScoreService', window.wordApp.SaveScoreService);
 
 };
 
-window.wordApp.wordEntryController.$inject = ['$scope', 'WordsService', 'SaveScoreService','pubsubProvider'];
+window.wordApp.wordEntryController.$inject = ['$scope', 'WordsService', 'SaveScoreService','pubsubProvider', 'ModalService'];
 window.wordApp.controller('wordEntryController', window.wordApp.wordEntryController);
+
+window.wordApp.controller('ModalController', function ($scope, close) {
+   $scope.close = function(result) {
+  close(result, 500); // close, but give 500ms for bootstrap to animate
+ };
+});
+
 window.wordApp.wordEntry = function(){
 	 return {
       restrict: 'AE',
