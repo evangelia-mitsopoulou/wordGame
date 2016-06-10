@@ -17,9 +17,11 @@ window.wordApp.homeController = function($scope, WordsService,SaveScoreService,p
 	};
 
 	$scope.viewScores = function(){
+		$scope.model.show = false; 
 		SaveScoreService.getScoreList().then(function(res){
 		pubsub.addObserver("scoreListReceived", res.data);
 		},function(){
+			console.log('score list data not received');
 		});
 	};
 };

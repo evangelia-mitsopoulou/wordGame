@@ -7,9 +7,15 @@ h2 {
 	border:1px solid #908F8F;
 	height:22em;
 	background-color:#464343;
-	margin-top:15%;
 }
 
+.home .container {
+    margin-top:15%;
+}
+
+.scoreList .container {
+    margin-top:5%;
+}
 .col-md-6 {
 	position:relative;
 	top:20%;
@@ -54,7 +60,7 @@ p {
 	margin:50px auto;
 }
 
-h3 {
+.wordEntry h3 {
   letter-spacing: 10px;
 }
 
@@ -93,4 +99,8 @@ h3 {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+.white {
+    background-color: white;
 }

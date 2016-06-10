@@ -90,22 +90,58 @@ window.wordApp.homeController = function($scope, WordsService,SaveScoreService,p
 	};
 
 	$scope.viewScores = function(){
+		$scope.model.show = false; 
 		SaveScoreService.getScoreList().then(function(res){
 		pubsub.addObserver("scoreListReceived", res.data);
 		},function(){
+			console.log('score list data not received');
 		});
 	};
 };
 
 window.wordApp.homeController.$inject = ['$scope', 'WordsService','SaveScoreService','pubsubProvider'];
 window.wordApp.controller('homeController', window.wordApp.homeController);
-window.wordApp.controller('scoresListController',['$scope', function($scope){
+window.wordApp.scoreList= function(){
+	 return {
+      restrict: 'AE',
+      templateUrl: 'src/scoreList/scoresListTemplate.html'
+  };
+};
+
+window.wordApp.directive('scoreList', window.wordApp.scoreList);
+window.wordApp.scoreListController = function($scope,pubsub){
+	
+	$scope.model = {show : false};
+	$scope.scorelist = {};
+
+	function onReceiveScoreListHandler(data){
+		$scope.model.show = true;
+		console.log('score list on controller is ',data);
+		//traverse through the retrieved object
+		var obj = data;
+		var scoreItem;
+		var k=0;
+		for (var i in obj) {
+			if (obj.hasOwnProperty(i)){
+				scoreItem = obj[i];
+				$scope.scorelist[k]=scoreItem;
+				k=k+1;
+			}
+		}
+		console.log('beautified scoelist is', $scope.scorelist);
+	}
+
 	$scope.backToStart = function(){};
 	$scope.init = function(){
-
+      pubsub.addListener("scoreListReceived",$scope,onReceiveScoreListHandler);
 	};
 
-}]);
+	
+
+};
+window.wordApp.scoreListController.$inject = ['$scope','pubsubProvider'];
+window.wordApp.controller('scoreListController', window.wordApp.scoreListController);
+
 
 window.wordApp.pubsubProvider = function($rootScope){
     
@@ -114,6 +150,7 @@ window.wordApp.pubsubProvider = function($rootScope){
     var listeners = {};
 
     var addObserver = function(eventName, item, e) {
+        
         $rootScope.$broadcast(eventName, item  ? { item: item } : e);
         observers[eventName]= this.addObserver; 
     };
@@ -181,6 +218,11 @@ window.wordApp.SaveScoreService= function($http, config,pubsub){
 };
 window.wordApp.SaveScoreService.$inject = ['$http','Configuration','pubsubProvider'];
 window.wordApp.service('SaveScoreService', window.wordApp.SaveScoreService);
+window.wordApp.controller('ModalController', function ($scope, close) {
+   $scope.close = function(result) {
+  close(result, 500); // close, but give 500ms for bootstrap to animate
+ };
+});
  /*jshint maxparams: 6 */
  window.wordApp.wordEntryController = function($scope, WordsService,SaveScoreService,pubsub,ModalService){
 	$scope.model = {show : false};
@@ -193,9 +235,9 @@ window.wordApp.service('SaveScoreService', window.wordApp.SaveScoreService);
            templateUrl: 'src/shared/modal.html',
             controller: "ModalController"
     });
-         document.getElementById('Name').setAttribute('disabled', true);
-         document.getElementById('Word').setAttribute('disabled', true);
-         document.getElementById('Submit').setAttribute('disabled', true);
+    document.getElementById('Name').setAttribute('disabled', true);
+    document.getElementById('Word').setAttribute('disabled', true);
+    document.getElementById('Submit').setAttribute('disabled', true);
  }
 
   function calculateScore (elWord){
@@ -218,7 +260,7 @@ window.wordApp.service('SaveScoreService', window.wordApp.SaveScoreService);
        $scope.model.score = 0;
        $scope.model.maxscore = SaveScoreService.getMaxScore(data.length);
        console.log('max score ', $scope.model.maxscore);
-       var fortySeconds = 3,
+       var fortySeconds = 40,
        display = document.querySelector('#counter');
        SaveScoreService.StartTimer(fortySeconds, display);
     };
@@ -226,7 +268,7 @@ window.wordApp.service('SaveScoreService', window.wordApp.SaveScoreService);
   $scope.init = function(){
     $scope.previousLength = 0; 
     $scope.deleteCounter = 0;
-     $scope.timerOut=false;
+    $scope.timerOut=false;
     pubsub.addListener("firstMangledWord", $scope, onGetFirstMangledHandler);
     pubsub.addListener("timeout",$scope,onTimeoutHandler);
   };
@@ -281,11 +323,6 @@ window.wordApp.service('SaveScoreService', window.wordApp.SaveScoreService);
 window.wordApp.wordEntryController.$inject = ['$scope', 'WordsService', 'SaveScoreService','pubsubProvider', 'ModalService'];
 window.wordApp.controller('wordEntryController', window.wordApp.wordEntryController);
 
-window.wordApp.controller('ModalController', function ($scope, close) {
-   $scope.close = function(result) {
-  close(result, 500); // close, but give 500ms for bootstrap to animate
- };
-});
 
 window.wordApp.wordEntry = function(){
 	 return {

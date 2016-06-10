@@ -1,1 +1,21 @@
-<h1> Score List View</h1>
+<div class="scoreList">
+<div class = "page-header"> <h2>Word Game App</h2>
+</div> 
+
+<h3 class="txt"> High Score List </h3>
+<div class = "container white">
+
+<div class = "row">
+   <div class="col-xs-12 col-sm-12">
+            <div class="row" ng-repeat = "item in scorelist">
+                <div class="col-xs-4 col-sm-6">
+                   {{item.name}}
+                </div>
+                <div class="col-xs-4 col-sm-6">
+                    {{item.score}}
+                </div>
+   </div>
+</div>	
+
+</div>
+</div>

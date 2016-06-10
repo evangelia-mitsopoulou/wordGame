@@ -10,9 +10,9 @@
            templateUrl: 'src/shared/modal.html',
             controller: "ModalController"
     });
-         document.getElementById('Name').setAttribute('disabled', true);
-         document.getElementById('Word').setAttribute('disabled', true);
-         document.getElementById('Submit').setAttribute('disabled', true);
+    document.getElementById('Name').setAttribute('disabled', true);
+    document.getElementById('Word').setAttribute('disabled', true);
+    document.getElementById('Submit').setAttribute('disabled', true);
  }
 
   function calculateScore (elWord){
@@ -35,7 +35,7 @@
        $scope.model.score = 0;
        $scope.model.maxscore = SaveScoreService.getMaxScore(data.length);
        console.log('max score ', $scope.model.maxscore);
-       var fortySeconds = 3,
+       var fortySeconds = 40,
        display = document.querySelector('#counter');
        SaveScoreService.StartTimer(fortySeconds, display);
     };
@@ -43,7 +43,7 @@
   $scope.init = function(){
     $scope.previousLength = 0; 
     $scope.deleteCounter = 0;
-     $scope.timerOut=false;
+    $scope.timerOut=false;
     pubsub.addListener("firstMangledWord", $scope, onGetFirstMangledHandler);
     pubsub.addListener("timeout",$scope,onTimeoutHandler);
   };
@@ -98,8 +98,3 @@
 window.wordApp.wordEntryController.$inject = ['$scope', 'WordsService', 'SaveScoreService','pubsubProvider', 'ModalService'];
 window.wordApp.controller('wordEntryController', window.wordApp.wordEntryController);
 
-window.wordApp.controller('ModalController', function ($scope, close) {
-   $scope.close = function(result) {
-  close(result, 500); // close, but give 500ms for bootstrap to animate
- };
-});

@@ -6,6 +6,7 @@ window.wordApp.pubsubProvider = function($rootScope){
     var listeners = {};
 
     var addObserver = function(eventName, item, e) {
+        
         $rootScope.$broadcast(eventName, item  ? { item: item } : e);
         observers[eventName]= this.addObserver; 
     };
