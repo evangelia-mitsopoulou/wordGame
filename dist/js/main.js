@@ -327,7 +327,7 @@ window.wordApp.controller('wordEntryController', window.wordApp.wordEntryControl
 window.wordApp.wordEntry = function(){
 	 return {
       restrict: 'AE',
-      templateUrl: 'src/wordEntry/WordEntryTemplate.html'
+      templateUrl: 'src/wordEntry/wordEntryTemplate.html'
   };
 };
 
